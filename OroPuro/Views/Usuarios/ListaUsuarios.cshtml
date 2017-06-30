@@ -1,0 +1,94 @@
+﻿@model IEnumerable<OroPuro.Models.Usuarios>
+
+@{
+    ViewBag.Title = "ListaUsuarios";
+    Layout = "~/Views/Shared/_LayoutUsr.cshtml";
+}
+
+<section class="content-header">
+    <h1>
+        Lista Usuarios      
+    </h1>
+</section>
+<section class="content">
+    @if (ViewBag.error != null){
+    <div class="alert alert-danger" role="alert">
+        <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
+        <span class="sr-only">Error:</span>
+        @ViewBag.error
+    </div> 
+    }
+    <div class="row">
+        <section class="col-lg-12">
+            <div class="box">
+                <div class="box-header">
+                    <a class="btn btn-success" href="@Url.Action("AgregarUsuarios", "Usuarios")">
+                        <span class="glyphicon glyphicon-plus" aria-hidden="true"> NuevoUsuario</span>
+                    </a>
+                </div>
+                <div class="box-body">
+                    <table class="table table-bordered table-responsive">
+                        <tr>
+                            <th>Nombre</th>
+                            <th>Telefono</th>
+                            <th>Email</th>
+                            <th>Usuario</th>
+                            <th>Password</th>
+                            <th>Tipo</th>
+                            <th>Accion</th>
+                        </tr>
+
+                        @foreach (var item in Model)
+            {
+                            <tr>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.nomUsr)
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.telUsr)
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.emailUsr)
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.usuarioUsr)
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.passUsr)
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.tipoUsr)
+                                </td>
+                                <td>
+                                    <a class="btn btn-warning" href="@Url.Action("EditarUsuarios", "Usuarios", new { id = item.idUsr})">
+                                        <span class="glyphicon glyphicon-pencil" aria-hidden="true"></span>
+                                    </a>
+                                    @if (item.usuarioUsr != "admin")
+                                    {
+                                        <a class="btn btn-danger btnElim" href="@Url.Action("EliminarUsuarios", "Usuarios", new { id = item.idUsr})" data-usuario="@item.usuarioUsr" data-id="@item.idUsr">
+                                            <span class="glyphicon glyphicon-trash" aria-hidden="true"></span>
+                                        </a>
+                                    }
+                                </td>
+                            </tr>
+                        }
+
+                    </table>
+                </div>
+            </div>
+        </section>
+    </div>
+</section>
+
+@section scripts
+{
+    <script>
+        $('.btnElim').click(function () {
+            if (!confirm('Deseas Eliminar al usuario: ' + $(this).data("usuario"))) {
+                event.preventDefault();
+            }
+        });
+    </script>
+}
+
+

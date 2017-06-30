@@ -1,0 +1,147 @@
+﻿@model OroPuro.Models.Usuarios
+@{
+    ViewBag.Title = "EditarUsuarios";
+    Layout = "~/Views/Shared/_LayoutUsr.cshtml";
+}
+
+<section class="content-header">
+    <h1>
+        Editar Usuario
+        <small><a href="@Url.Action("ListaUsuarios", "Usuarios")">Lista Usuarios</a></small>
+</h1>
+</section>
+<section class="content">
+    @if (ViewBag.error != null)
+    {
+        <div class="alert alert-danger" role="alert">
+            <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
+            <span class="sr-only">Error:</span>
+            @ViewBag.error
+        </div>
+    }
+    <div class="row">
+        <section class="col-lg-12">
+            <div class="box">
+                <div class="box-body">
+                    @using (Html.BeginForm())
+                    {
+                        @Html.AntiForgeryToken()
+                        @Html.HiddenFor(model => model.idUsr)
+                        <div class="form-horizontal">
+                            <div class="row">
+                                <div class="col-md-7 col-md-offset-1">
+                                    <label>Nombre: </label>
+                                    @if (Model.nomUsr == "Administrador")
+                                    {
+                                        @Html.EditorFor(model => model.nomUsr, new { htmlAttributes = new { @class = "form-control", @readonly = "readonly" } })
+                                    }
+                                    else
+                                    {
+                                        @Html.EditorFor(model => model.nomUsr, new { htmlAttributes = new { @class = "form-control" } })
+                                    }
+                                </div>
+                                <div class="col-md-4" style="padding-top:2%">
+                                    @Html.ValidationMessageFor(model => model.nomUsr, "", new { @class = "text-danger" })
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <div class="col-md-7 col-md-offset-1">
+                                    <label>Apellido Paterno: </label>
+                                    @Html.EditorFor(model => model.apellPUsr, new { htmlAttributes = new { @class = "form-control" } })
+                                </div>
+                                <div class="col-md-4" style="padding-top:2%">
+                                    @Html.ValidationMessageFor(model => model.apellPUsr, "", new { @class = "text-danger" })
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <div class="col-md-7 col-md-offset-1">
+                                    <label>Apellido Materno: </label>
+                                    @Html.EditorFor(model => model.apellMUsr, new { htmlAttributes = new { @class = "form-control" } })
+                                </div>
+                                <div class="col-md-4" style="padding-top:2%">
+                                    @Html.ValidationMessageFor(model => model.apellMUsr, "", new { @class = "text-danger" })
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <div class="col-md-5 col-md-offset-1">
+                                    <label>Telefono: </label>
+                                    @Html.EditorFor(model => model.telUsr, new { htmlAttributes = new { @class = "form-control" } })
+                                </div>
+                                <div class="col-md-4" style="padding-top:2%">
+                                    @Html.ValidationMessageFor(model => model.telUsr, "", new { @class = "text-danger" })
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <div class="col-md-7 col-md-offset-1">
+                                    <label>E-Mail: </label>
+                                    @Html.EditorFor(model => model.emailUsr, new { htmlAttributes = new { @class = "form-control" } })
+                                </div>
+                                <div class="col-md-4" style="padding-top:2%">
+                                    @Html.ValidationMessageFor(model => model.emailUsr, "", new { @class = "text-danger" })
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <div class="col-md-5 col-md-offset-1">
+                                    <label>Usuario: </label>
+                                    @if (Model.nomUsr == "Administrador")
+                                    {
+                                        @Html.EditorFor(model => model.usuarioUsr, new { htmlAttributes = new { @class = "form-control", @readonly = "readonly" } })
+                                    }
+                                    else
+                                    {
+                                        @Html.EditorFor(model => model.usuarioUsr, new { htmlAttributes = new { @class = "form-control" } })
+                                    }
+                                </div>
+                                <div class="col-md-4" style="padding-top:2%">
+                                    @Html.ValidationMessageFor(model => model.usuarioUsr, "", new { @class = "text-danger" })
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <div class="col-md-5 col-md-offset-1">
+                                    <label>Contraseña: </label>
+                                    @Html.EditorFor(model => model.passUsr, new { htmlAttributes = new { @class = "form-control" } })
+                                </div>
+                                <div class="col-md-4" style="padding-top:2%">
+                                    @Html.ValidationMessageFor(model => model.passUsr, "", new { @class = "text-danger" })
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <div class="col-md-3 col-md-offset-1">
+                                    <label>Tipo de Usuario: </label>
+                                    @if (Model.nomUsr == "Administrador")
+                                    {
+                                        @Html.EditorFor(model => model.tipoUsr, new { htmlAttributes = new { @class = "form-control", @readonly = "readonly" } })
+                                    }
+                                    else
+                                    {
+                                        @Html.DropDownListFor(model => model.tipoUsr, new SelectList(
+                                          new List<Object>{
+                                              "Usuario",
+                                              "Administrador"
+                                            }), new { @class = "form-control" })
+                                    }
+                                </div>
+                                <div class="col-md-4" style="padding-top:2%">
+                                    @Html.ValidationMessageFor(model => model.tipoUsr, "", new { @class = "text-danger" })
+                                </div>
+                            </div>
+
+                            <div class="form-group center-block">
+                                <div class="col-md-offset-5 col-md-10">
+                                    <input type="submit" value="ACTUALIZAR" class="btn btn-success" />
+                                </div>
+                            </div>
+                        </div>
+                    }
+                </div>
+            </div>
+        </section>
+    </div>
+</section>

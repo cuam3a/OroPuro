@@ -1,0 +1,66 @@
+﻿@model OroPuro.Models.LogInModel
+@{
+    Layout = "";
+}
+
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>Oro Puro | Acceso</title>
+    <!-- Tell the browser to be responsive to screen width -->
+    <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.5.0/css/font-awesome.min.css">
+    <!-- Ionicons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/ionicons/2.0.1/css/ionicons.min.css">
+    @Styles.Render("~/Content/panelcss")
+
+</head>
+<body class="hold-transition login-page">
+    <div class="login-box">
+        <div class="login-logo">
+            <a href="@Url.Action("paginaConst", "Home", null)"><b>ORO</b>PURO</a>
+        </div>
+        <!-- /.login-logo -->
+        <div class="login-box-body">
+            <h4 class="login-box-msg">Iniciar Sesion</h4>
+            @using (Html.BeginForm("Index", "Usuarios", FormMethod.Post))
+            {
+                <form class="form-inline">
+                    <div class="form-group has-feedback">
+                        <div><span class="glyphicon glyphicon-user form-control-feedback"> Usuario</span></div>
+                        @Html.TextBoxFor(u => u.usuario, new { @class = "form-control" })
+                    </div>
+                    <div class="form-group has-feedback">
+                        <div><span class="glyphicon glyphicon-lock form-control-feedback"> Password</span></div>
+                        @Html.PasswordFor(u => u.password, new { @class = "form-control" })
+                    </div>
+                    <div class="row">
+                        <div class="col-xs-8 text-danger">
+                            @Html.AntiForgeryToken()
+                            @Html.ValidationSummary(true)<br/>
+                            @Html.ValidationMessageFor(u => u.usuario)<br />
+                            @Html.ValidationMessageFor(u => u.password)<br />
+                        </div>
+                        <!-- /.col -->
+                        <div class="col-xs-4">
+                            <button type="submit" class="btn btn-primary btn-block btn-flat">Entrar</button>
+                        </div>
+                        <!-- /.col -->
+                    </div>
+                </form>
+            }
+        </div>
+        <!-- /.login-box-body -->
+    </div>
+    <!-- /.login-box -->
+    @Scripts.Render("~/bundles/jquery")
+    @Scripts.Render("~/bundles/bootstrap")
+    @Scripts.Render("~/bundles/paneljs")
+</body>
+</html>
+
+

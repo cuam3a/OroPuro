@@ -1,0 +1,352 @@
+﻿
+@{
+    ViewBag.Title = "DashVentas";
+    Layout = "~/Views/Shared/_LayoutUsr.cshtml";
+}
+<section class="content-header">
+    <h1>
+        Dashboard Ventas
+    </h1>
+</section>
+
+<section class="container">
+    <div class="box box-body">
+        <div class="row form-group">
+            <div class="col-md-4 form-group-sm" style="padding-left:3%">
+                <label class="control-label">Vendedor</label>
+                <select class="selectpicker" multiple id="selecVend"></select>
+            </div>
+            <div class="col-md-4 form-group-sm" style="padding-left:3%">
+                <label class="control-label">Producto</label>
+                <select class="selectpicker" multiple id="selecProd"></select>
+            </div>
+            <div class="col-md-4 form-group-sm" style="padding-left:3%">
+                <a class="btn btn-warning form-control" href="@Url.Action("DashVentas", "Dashboards")">Eliminar Filtros</a>
+            </div>
+        </div>
+        <div class="row form-group">
+            <div class="col-md-4 form-group-sm" style="padding-left:6%">
+                <label class="control-label">Año</label>
+                <select class="selectpicker" id="selecAño">
+                    <option value="Todos">Todos</option>
+                </select>
+            </div>
+            <div class="col-md-4 form-group-sm" style="padding-left:6%">
+                <label class="control-label">Mes</label>
+                <select class="selectpicker" multiple id="selecMes"></select>
+            </div>
+            <div class="col-md-4 form-group-sm" style="padding-left:3%">
+                <label class="control-label">Semanas</label>
+                <select class="selectpicker" multiple id="selecSem"></select>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-12">
+        <div class="box box-primary">
+            <div class="box-header with-border">
+                <h3 class="box-title">Ingreso por Vendedor</h3>
+                <div class="box-tools pull-right">
+                </div>
+            </div>
+            <div class="chart-container" id="ingresoVendid">
+                <canvas id="ingresoVend"></canvas>
+            </div>
+        </div>
+        <!-- /.box-body -->
+    </div>
+    <div class="col-md-12">
+        <div class="box box-warning">
+            <div class="box-header with-border">
+                <h3 class="box-title">Ingreso por Producto</h3>
+                <div class="box-tools pull-right">
+                </div>
+            </div>
+            <div class="chart-container" id="ingresoProdid">
+                <canvas id="ingresoProd"></canvas>
+            </div>
+        </div>
+        <!-- /.box-body -->
+    </div>
+    <div class="col-md-12">
+        <div class="box box-danger">
+            <div class="box-header with-border">
+                <h3 class="box-title">Unidades Vendidas</h3>
+                <div class="box-tools pull-right">
+                </div>
+            </div>
+            <div class="chart-container" id="unidProdid">
+                <canvas id="unidProd"></canvas>
+            </div>
+        </div>
+    </div>
+</section>
+
+@section scripts{
+    <script src="~/Scripts/Chart.min.js"></script>
+    <script src="~/Scripts/bootstrap-select.js"></script>
+    <script>
+        var d = ""
+
+        var meses = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"]
+
+        var selectV = []
+        var selectP = []
+        var selectA = []
+        var selectM = []
+        var selectS = []
+
+        var selecEna = false
+
+        $(function () {
+            selectV = ""
+            selectP = ""
+            selectA = ""
+            selectM = ""
+            selectS = ""
+            procesoPrincipal()
+        })
+
+        //Accion de Selec Vendedor
+        $("select#selecVend").change(function (event) {
+            selectV = $("#selecVend").val()
+            if (selectV == null) {
+                selectV = ""
+            }
+            procesoPrincipal()
+        })
+
+        //Accion de Selec Producto
+        $("select#selecProd").change(function (event) {
+            selectP = $("#selecProd").val()
+            if (selectP == null) {
+                selectP = ""
+            }
+            procesoPrincipal()
+        })
+
+        //Accion de Selec Año
+        $("select#selecAño").change(function (event) {
+            selectA = $("#selecAño").val()
+            if (selectA == "Todos") {
+                selecEna = false
+                selectA = ""
+                selectM = ""
+                selectS = ""
+                $("#selecMes").empty()
+                $("#selecSem").empty()
+
+            } else {
+                selecEna = true
+            }
+            procesoPrincipal()
+        })
+
+        //Accion de Selec Mes
+        $("select#selecMes").change(function (event) {
+            selectM = $("#selecMes").val()
+            if (selectM == null) {
+                selectM = ""
+            }
+            procesoPrincipal()
+        })
+
+        //Accion de Selec Semana
+        $("select#selecSem").change(function (event) {
+            selectS = $("#selecSem").val()
+            if (selectS == null) {
+                selectS = ""
+            }
+            procesoPrincipal()
+        })
+
+        function procesoPrincipal() {
+            $.ajax({
+                type: "POST",
+                data: "{ 'selV':'" + selectV + "', 'selP':'" + selectP + "', 'selA':'" + selectA + "', 'selM':'" + selectM + "', 'selS':'" + selectS + "'}",
+                url: "@Url.Action("DatosVentas", "Dashboards")",
+                contentType: "application/json",
+                dataType: "json",
+                processData: false,
+            }).done(function (data) {
+                d = JSON.parse(data)
+
+                //Funcion para arreglo nombres de vendedores
+                var nomVend = d.Vendedor.slice(',')
+                //Si no hay nada seleccionado en el select se hace update
+                if ($("#selecVend").val() == null) {
+                    UpdateVendedor(nomVend)
+                }
+
+                //Funcion para arreglo nombres de Productos
+                var nomProd = d.Producto.slice(',')
+                //Si no hay nada seleccionado en el select se hace update
+                if ($("#selecProd").val() == null) {
+                    UpdateProducto(nomProd)
+                }
+
+                //Funcion para arreglo nombres de Años
+                año = d.Año.slice(',')
+                //Si no hay nada seleccionado en el select se hace update
+                if ($("#selecAño").val() == "Todos") {
+                    UpdateAño(año)
+                }
+
+                //Verifica si el select años tiene un valor seleccionado
+                if (selecEna === false) {
+                    $('#selecMes').prop('disabled', 'disabled');
+                    $('#selecSem').prop('disabled', 'disabled');
+                }
+                else {
+                    $('#selecMes').prop('disabled', false);
+                    $('#selecSem').prop('disabled', false);
+
+                    //Funcion para arreglo Meses
+                    var mesSel = d.Mes.slice(',')
+                    //Si no hay nada seleccionado en el select se hace update
+                    if ($("#selecMes").val() == null) {
+                        UpdateMes(mesSel)
+                    }
+
+                    //Funcion para arreglo semanas
+                    var semanaSel = d.Sem.slice(',')
+                    //Si no hay nada seleccionado en el select se hace update
+                    if ($("#selecSem").val() == null) {
+                        UpdateSem(semanaSel)
+                    }
+                }
+
+                //Se refresca selects para mostrar nuevos datos
+                $('.selectpicker').selectpicker('refresh');
+
+                //Obtiene los valores para las graficas
+                var totVent = d.TotVentas.slice(',')
+                var totProd = d.TotProducto.slice(',')
+                var TotCan = d.TotCanProd.slice(',')
+
+                //Llama a las funciones para renderizar las graficas (datos, valores, idcanvas, color rgb)
+                graficaBarra(nomVend, totVent, "#ingresoVend", "151,187,205")
+                graficaBarra(nomProd, totProd, "#ingresoProd", "255,198,44")
+                graficaBarra(nomProd, TotCan, "#unidProd", "255,28,28")
+
+            }).fail(function () {
+                alert("error")
+            })
+        }
+
+        //Funcion rellenado de select Producto
+        function UpdateVendedor(vend) {
+            $("#selecVend").empty()
+            $.each(vend, function (i, item) {
+                $('#selecVend').append($('<option>', {
+                    value: item,
+                    text: item
+                }));
+            });
+        }
+
+        //Funcion llenado de select Producto
+        function UpdateProducto(prod) {
+            $("#selecProd").empty()
+            $.each(prod, function (i, item) {
+                $('#selecProd').append($('<option>', {
+                    value: item,
+                    text: item
+                }));
+            });
+        }
+
+        //Funcion llenado de select Año
+        function UpdateAño(añoU) {
+            $("#selecAño").empty()
+            $('#selecAño').append($('<option>', {
+                value: "Todos",
+                text: "Todos"
+            }));
+            $.each(añoU, function (i, item) {
+                $('#selecAño').append($('<option>', {
+                    value: item,
+                    text: item
+                }));
+            });
+        }
+
+        //Funcion llenado de select Mes
+        function UpdateMes(mesU) {
+            $("#selecMes").empty()
+            $.each(mesU, function (i, item) {
+                $('#selecMes').append($('<option>', {
+                    value: item,
+                    text: meses[parseInt(item) - 1]
+                }));
+            });
+        }
+
+        //Funcion llenado de select Semana
+        function UpdateSem(semU) {
+            semU.sort(function (a, b) {
+                if (a > b) {
+                    return 1;
+                }
+                if (a < b) {
+                    return -1;
+                }
+                return 0;
+            });
+            $("#selecSem").empty()
+            $.each(semU, function (i, item) {
+                $('#selecSem').append($('<option>', {
+                    value: item,
+                    text: item
+                }));
+            });
+        }
+
+        //Funcion render grafica barras
+        function graficaBarra(vend, costo, canvas, color) {
+            $(canvas).remove()
+            $(canvas + "id").append('<canvas id=' + canvas.replace('#', '') + '></canvas>')
+            var tempData = {
+                labels: vend,
+                datasets: [{
+                    fillColor: "rgba(" + color + ",0.2)",
+                    strokeColor: "rgba(" + color + ",1)",
+                    pointColor: "rgba(" + color + ",1)",
+                    pointStrokeColor: "#fff",
+                    pointHighlightFill: "#fff",
+                    pointHighlightStroke: "rgba(" + color + ",1)",
+                    data: costo,
+                }]
+            };
+            var barChartOptions = {
+                //Boolean - Whether the scale should start at zero, or an order of magnitude down from the lowest value
+                scaleBeginAtZero: true,
+                //Boolean - Whether grid lines are shown across the chart
+                scaleShowGridLines: true,
+                //String - Colour of the grid lines
+                scaleGridLineColor: "rgba(0,0,0,.05)",
+                //Number - Width of the grid lines
+                scaleGridLineWidth: 1,
+                //Boolean - Whether to show horizontal lines (except X axis)
+                scaleShowHorizontalLines: true,
+                //Boolean - Whether to show vertical lines (except Y axis)
+                scaleShowVerticalLines: true,
+                //Boolean - If there is a stroke on each bar
+                barShowStroke: true,
+                //Number - Pixel width of the bar stroke
+                barStrokeWidth: 1,
+                //Number - Spacing between each of the X value sets
+                barValueSpacing: 3,
+                //Number - Spacing between data sets within X values
+                barDatasetSpacing: 1,
+                //String - A legend template
+                legendTemplate: "<ul class=\"<%=name.toLowerCase()%>-legend\"><% for (var i=0; i<datasets.length; i++){%><li><span style=\"background-color:<%=datasets[i].fillColor%>\"></span><%if(datasets[i].label){%><%=datasets[i].label%><%}%></li><%}%></ul>",
+                //Boolean - whether to make the chart responsive
+                responsive: true,
+                maintainAspectRatio: true
+            };
+            var ctx = $(canvas).get(0).getContext("2d");
+            var barChart = new Chart(ctx).Bar(tempData, barChartOptions)
+        }
+    </script>
+}
